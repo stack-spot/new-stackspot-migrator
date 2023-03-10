@@ -97,7 +97,7 @@ def do_conversion(plugin_folder_path):
     os.rename(plugin_yaml_file_path, plugin_old_yaml_file_path)
 
     print("Updating plugin.yaml with the new content...")
-    __write_yaml_content_to_file(new_yaml, plugin_yaml_file_path, sort_keys=False)
+    __write_yaml_content_to_file(new_yaml, plugin_yaml_file_path)
 
     print("Copying release notes and requirements doc files to docs folder")
     script_folder_path = sys.path[0] + os.sep

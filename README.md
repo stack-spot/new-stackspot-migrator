@@ -1,5 +1,5 @@
 ### Requirements:
-- Stackspot v.4.4+
+- Stackspot cli v.4.4+, but not the new Stackspot cli.
 - Python v3.9+ (python3 available in terminal)
 
 ### Plugin migration:

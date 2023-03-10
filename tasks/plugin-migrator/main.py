@@ -21,28 +21,6 @@ def __write_yaml_content_to_file(yaml_dict, yaml_file_path, sort_keys=False):
         except yaml.YAMLError as exception:
             print(exception)
 
-
-def __get_dict_string_value(dictionary, key):
-    try:
-        return dictionary[key]
-    except:
-        return ""
-
-
-def __get_dict_list_value(dictionary, key):
-    try:
-        return dictionary[key]
-    except:
-        return []
-
-
-def __get_dict_object_value(dictionary, key):
-    try:
-        return dictionary[key]
-    except:
-        return {}
-
-
 # Moves a whole property-value from __old_yaml to the spec property of __new_yaml
 def __move_to_spec_property(__old_yaml, __new_yaml, property_name):
     if __old_yaml.get(property_name) is not None:

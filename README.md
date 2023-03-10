@@ -1,6 +1,7 @@
 ### Requirements:
 - Stackspot cli v.4.4+, but not the new Stackspot cli.
 - Python v3.9+ (python3 available in terminal)
+- PyYAML lib (https://pypi.org/project/PyYAML/)
 
 ### Plugin migration:
 

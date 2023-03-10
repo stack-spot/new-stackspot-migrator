@@ -21,6 +21,7 @@ def __write_yaml_content_to_file(yaml_dict, yaml_file_path, sort_keys=False):
         except yaml.YAMLError as exception:
             print(exception)
 
+
 # Moves a whole property-value from __old_yaml to the spec property of __new_yaml
 def __move_to_spec_property(__old_yaml, __new_yaml, property_name):
     if __old_yaml.get(property_name) is not None:
@@ -54,7 +55,8 @@ def do_conversion(plugin_folder_path):
         },
         "metadata": {
             "picture": current_yaml.pop("picture"),
-            "display-name": current_yaml.pop("display-name"),
+            "display-name": current_yaml.pop("display-name") if current_yaml.get(
+                "display-name") is not None else current_yaml.pop("displayName"),
             "version": "0.0.1",
             "name": current_yaml.pop("name"),
             "description": current_yaml.pop("description")

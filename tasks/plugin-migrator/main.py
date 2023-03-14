@@ -47,7 +47,7 @@ def do_conversion(plugin_folder_path):
             "requirements": "docs/requirements.md",
             "repository": "PENDING",
             "implementation": current_yaml.pop("implementation"),
-            "type": "App",
+            "type": "app",
             "release-notes": "docs/release-notes-0.0.1.md",
             "usage": current_yaml.pop("usage"),
             "technologies": current_yaml.pop("technologies"),

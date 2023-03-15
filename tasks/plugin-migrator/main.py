@@ -110,5 +110,4 @@ def do_conversion(plugin_folder_path):
     print("Done!")
 
 
-do_conversion("/Users/igordgzup/workspaces/stackspot/igor_newstkcli_advanced_tests/plugin-sample-3")
-# do_conversion(str(sys.argv[1]).strip())
+do_conversion(str(sys.argv[1]).strip())

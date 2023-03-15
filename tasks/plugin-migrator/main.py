@@ -5,6 +5,20 @@ import sys
 import yaml
 
 
+def __get_repository_url(plugin_folder_path):
+    config_file_path = plugin_folder_path + os.sep + ".git" + os.sep + "config"
+    repo_url = ""
+    if os.path.exists(config_file_path):
+        with open(config_file_path, "r") as input_stream:
+            config_file_content = input_stream.readlines()
+            for __line in config_file_content:
+                if "url" in __line:
+                    repo_url = str(__line).split("=", 1)[1].strip()
+                    print("Plugin repository found: " + repo_url)
+
+    return repo_url
+
+
 def __get_yaml_content_from_file(yaml_file_path):
     with open(yaml_file_path, "r") as stream:
         try:
@@ -45,7 +59,6 @@ def do_conversion(plugin_folder_path):
         "spec": {
             "about": current_yaml.pop("about"),
             "requirements": "docs/requirements.md",
-            "repository": "PENDING",
             "implementation": current_yaml.pop("implementation"),
             "type": "app",
             "release-notes": "docs/release-notes-0.0.1.md",
@@ -63,9 +76,14 @@ def do_conversion(plugin_folder_path):
         }
     }
 
+    repository_url = __get_repository_url(plugin_folder_path)
+    if repository_url is not None:
+        new_yaml["spec"]["repository"] = repository_url
+
     # Key 'requirements' now is 'spec.requires'
     if current_yaml.get("requirements") is not None:
-        new_yaml["spec"]["requires"] = current_yaml.pop("requirements")
+        plugin_yaml_part = {"plugin": current_yaml.pop("requirements")}
+        new_yaml["spec"]["requires"] = plugin_yaml_part
 
     __move_to_spec_property(current_yaml, new_yaml, "inputs")
     __move_to_spec_property(current_yaml, new_yaml, "computed-inputs")
@@ -79,7 +97,7 @@ def do_conversion(plugin_folder_path):
     print("Updating plugin.yaml with the new content...")
     __write_yaml_content_to_file(new_yaml, plugin_yaml_file_path)
 
-    print("Copying release notes and requirements doc files to docs folder")
+    print("Copying release notes and requirements doc files to docs folder...")
     script_folder_path = sys.path[0] + os.sep
     plugin_docs_folder_path = plugin_folder_path + os.sep + "docs" + os.sep
     release_notes_filename = "release-notes-0.0.1.md"
@@ -89,5 +107,8 @@ def do_conversion(plugin_folder_path):
     shutil.copy(script_folder_path + requirements_filename,
                 plugin_docs_folder_path + requirements_filename)
 
+    print("Done!")
 
-do_conversion(str(sys.argv[1]).strip())
+
+do_conversion("/Users/igordgzup/workspaces/stackspot/igor_newstkcli_advanced_tests/plugin-sample-3")
+# do_conversion(str(sys.argv[1]).strip())

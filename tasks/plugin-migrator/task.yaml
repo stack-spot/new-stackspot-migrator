@@ -15,4 +15,4 @@ command:
   mac: |
     python3 {{component_path}}/main.py "{{plugin_folder_path}}"
   windows: |
-    cmd /C python3 {{component_path}}\main.py "{{plugin_folder_path}} "
+    cmd /C python {{component_path}}\main.py "{{plugin_folder_path}} "

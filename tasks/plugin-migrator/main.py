@@ -1,8 +1,10 @@
 import os
 import shutil
 import sys
+from ruamel.yaml import YAML
 
-import yaml
+yaml = YAML()
+yaml.preserve_quotes = True
 
 
 def __get_repository_url(plugin_folder_path):
@@ -21,19 +23,13 @@ def __get_repository_url(plugin_folder_path):
 
 def __get_yaml_content_from_file(yaml_file_path):
     with open(yaml_file_path, "r") as stream:
-        try:
-            content = yaml.safe_load(stream.read())
-        except yaml.YAMLError as exception:
-            print(exception)
+        content = yaml.load(stream.read())
     return content
 
 
 def __write_yaml_content_to_file(yaml_dict, yaml_file_path, sort_keys=False):
     with open(yaml_file_path, "w") as stream:
-        try:
-            yaml.dump(yaml_dict, stream, default_flow_style=False, sort_keys=sort_keys)
-        except yaml.YAMLError as exception:
-            print(exception)
+        yaml.dump(yaml_dict, stream)
 
 
 # Moves a whole property-value from __old_yaml to the spec property of __new_yaml
@@ -77,7 +73,7 @@ def do_conversion(plugin_folder_path):
     }
 
     repository_url = __get_repository_url(plugin_folder_path)
-    if repository_url is not None:
+    if repository_url is not None and repository_url:
         new_yaml["spec"]["repository"] = repository_url
 
     # Key 'requirements' now is 'spec.requires'

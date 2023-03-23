@@ -1,18 +1,18 @@
 name: plugin-migrator
-description: Reads a plugin folder and update files to the new stackspot format
+description: Reads a plugin or template folder and updates its files to the new stackspot format
 supported-os:
   - windows
   - linux
   - mac
 inputs:
-  - label: "Plugin folder full path:"
+  - label: "Plugin or Template folder full path:"
     type: text
-    name: plugin_folder_path
+    name: plugin_or_template_folder_path
     required: true
 command:
   linux: |
-    python3 {{component_path}}/main.py "{{plugin_folder_path}}"
+    python3 {{component_path}}/main.py "{{plugin_or_template_folder_path}}"
   mac: |
-    python3 {{component_path}}/main.py "{{plugin_folder_path}}"
+    python3 {{component_path}}/main.py "{{plugin_or_template_folder_path}}"
   windows: |
-    cmd /C python {{component_path}}\main.py "{{plugin_folder_path}} "
+    cmd /C python {{component_path}}\main.py "{{plugin_or_template_folder_path}} "

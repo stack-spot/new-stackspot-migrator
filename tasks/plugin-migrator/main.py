@@ -40,8 +40,8 @@ def __write_yaml_content_to_file(yaml_dict, yaml_file_path, sort_keys=False):
         yaml.dump(yaml_dict, stream)
 
 
-# Moves a whole property-value from __old_yaml to the spec property of __new_yaml
-def __move_to_spec_property(__old_yaml, __new_yaml, property_name):
+# Moves a whole node-value from __old_yaml to the spec node of __new_yaml
+def __move_to_spec_node(__old_yaml, __new_yaml, property_name):
     if __old_yaml.get(property_name) is not None:
         __new_yaml["spec"][property_name] = __old_yaml.pop(property_name)
 
@@ -64,9 +64,42 @@ def __get_yaml_name(folder_path):
 
 
 def __get_display_name(yaml_dic):
-    if yaml_dic.get("display-name") is not None:
-        return yaml_dic.pop("display-name")
-    return yaml_dic.pop("displayName")
+    __display_name = "display-name"
+    if yaml_dic.get(__display_name) is not None:
+        return yaml_dic.pop(__display_name)
+    __display_name = "displayName"
+    if yaml_dic.get(__display_name) is not None:
+        return yaml_dic.pop(__display_name)
+    return None
+
+
+def __get_about_node_value(__current_yaml):
+    return __current_yaml.pop("about") if __current_yaml.get("about") is not None else "docs/about.md"
+
+
+def __get_implementation_node_value(__current_yaml):
+    return __current_yaml.pop("implementation") if __current_yaml.get(
+        "implementation") is not None else "docs/implementation.md"
+
+
+def __get_usage_node_value(__current_yaml):
+    return __current_yaml.pop("usage") if __current_yaml.get(
+        "usage") is not None else "docs/usage.md"
+
+
+def __get_technologies_node_value(__current_yaml):
+    return __current_yaml.pop("technologies") if __current_yaml.get(
+        "technologies") is not None else ["Api"]
+
+
+def __get_compatibility_node_value(__current_yaml):
+    return __current_yaml.pop("compatibility") if __current_yaml.get(
+        "compatibility") is not None else ["python"]
+
+
+def __get_picture_node_value(__current_yaml):
+    return __current_yaml.pop("picture") if __current_yaml.get(
+        "picture") is not None else "picture.png"
 
 
 def convert_to_new_plugin(resource_folder_path):
@@ -83,36 +116,35 @@ def convert_to_new_plugin(resource_folder_path):
     current_yaml_file_path = resource_folder_path + os.sep + yaml_name + ".yaml"
     current_yaml = __get_yaml_content_from_file(current_yaml_file_path)
 
-    __name_attribute_value = current_yaml.pop("name")
-    if "_" in __name_attribute_value:
+    __name_node_value = current_yaml.pop("name")
+    if "_" in __name_node_value:
         print("Warning: underscore chars '_' will be replace to '-'")
-        __name_attribute_value = str(__name_attribute_value).replace("_", "-")
+        __name_node_value = str(__name_node_value).replace("_", "-")
+
+    __display_name_node_value = __get_display_name(current_yaml)
+    if __display_name_node_value is None:
+        print("Nodes display-name and displayName not found. Using node name...")
+        __display_name_node_value = __name_node_value
 
     # base structure (https://newdocs.stackspot.com/platform-content/studio/plugin/create-plugin/)
     new_yaml = {
         "kind": "plugin",
         "schema-version": "v1",
         "spec": {
-            "about": current_yaml.pop("about") if current_yaml.get("about") is not None else "docs/about.md",
+            "about": f"{__get_about_node_value(current_yaml)}",
             "requirements": "docs/requirements.md",
-            "implementation": current_yaml.pop("implementation") if current_yaml.get(
-                "implementation") is not None else "docs/implementation.md",
+            "implementation": f"{__get_implementation_node_value(current_yaml)}",
             "type": "app",
             "release-notes": "docs/release-notes-0.0.1.md",
-            "usage": current_yaml.pop("usage") if current_yaml.get(
-                "usage") is not None else "docs/usage.md",
-            "technologies": current_yaml.pop("technologies") if current_yaml.get(
-                "technologies") is not None else ["Api"],
-            "compatibility": current_yaml.pop("compatibility") if current_yaml.get(
-                "compatibility") is not None else ["python"]
+            "usage": f"{__get_usage_node_value(current_yaml)}",
+            "technologies": __get_technologies_node_value(current_yaml),
+            "compatibility": __get_compatibility_node_value(current_yaml)
         },
         "metadata": {
-            "picture": current_yaml.pop("picture") if current_yaml.get(
-                "picture") is not None else "picture.png",
-            "display-name": __get_display_name(
-                current_yaml) if yaml_name == YamlName.PLUGIN.value else f"{__name_attribute_value}",
+            "picture": f"{__get_picture_node_value(current_yaml)}",
+            "display-name": f"{__display_name_node_value}",
             "version": "0.0.1",
-            "name": f"{__name_attribute_value}",
+            "name": f"{__name_node_value}",
             "description": current_yaml.pop("description")
         }
     }
@@ -126,10 +158,13 @@ def convert_to_new_plugin(resource_folder_path):
         plugin_yaml_part = {"plugin": current_yaml.pop("requirements")}
         new_yaml["spec"]["requires"] = plugin_yaml_part
 
-    __move_to_spec_property(current_yaml, new_yaml, "inputs")
-    __move_to_spec_property(current_yaml, new_yaml, "computed-inputs")
-    __move_to_spec_property(current_yaml, new_yaml, "global-computed-inputs")
-    __move_to_spec_property(current_yaml, new_yaml, "hooks")
+    __move_to_spec_node(current_yaml, new_yaml, "inputs")
+    if current_yaml.get("computedInputs") is not None:
+        new_yaml["spec"]["computed-inputs"] = current_yaml.pop("computedInputs")
+    else:
+        __move_to_spec_node(current_yaml, new_yaml, "computed-inputs")
+    __move_to_spec_node(current_yaml, new_yaml, "global-computed-inputs")
+    __move_to_spec_node(current_yaml, new_yaml, "hooks")
 
     print(f"The following content was not converted in {yaml_name}.yaml: " + str(current_yaml))
     print(f"Backup: renaming {yaml_name}.yaml to {yaml_name}_old.yaml...")
